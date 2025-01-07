@@ -32,14 +32,27 @@
             display: block;
             margin-bottom: 5px;
         }
-        .form-group input, .form-group textarea, .form-group select {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        .form-group textarea {
-            height: 200px;
+        .rich-text-toolbar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .rich-text-toolbar button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        #content {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: Arial, sans-serif;
         }
         .buttons {
             margin-top: 10px;
@@ -58,15 +71,6 @@
         .print-button button {
             padding: 10px 20px;
             font-size: 16px;
-            cursor: pointer;
-        }
-        .rich-text-toolbar {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-        .rich-text-toolbar button {
-            padding: 5px 10px;
             cursor: pointer;
         }
     </style>
@@ -105,8 +109,10 @@
                         <button type="button" onclick="execCommand('justifyLeft')">Align Left</button>
                         <button type="button" onclick="execCommand('justifyCenter')">Center</button>
                         <button type="button" onclick="execCommand('justifyRight')">Align Right</button>
+                        <button type="button" onclick="execCommand('insertTable')">Insert Table</button>
+                        <button type="button" onclick="execCommand('removeFormat')">Clear Formatting</button>
                     </div>
-                    <div id="content" contenteditable="true" style="border: 1px solid #ccc; padding: 8px; height: 200px; overflow-y: auto;"></div>
+                    <div id="content" contenteditable="true"></div>
                 </div>
                 <div class="buttons">
                     <button type="button" onclick="createReport()">Create</button>
@@ -131,7 +137,30 @@
         let currentReport = null;
 
         function execCommand(command) {
-            document.execCommand(command, false, null);
+            if (command === 'insertTable') {
+                const rows = prompt('Enter number of rows:');
+                const cols = prompt('Enter number of columns:');
+                if (rows && cols) {
+                    const table = document.createElement('table');
+                    table.style.border = '1px solid black';
+                    table.style.borderCollapse = 'collapse';
+                    for (let i = 0; i < rows; i++) {
+                        const tr = document.createElement('tr');
+                        for (let j = 0; j < cols; j++) {
+                            const td = document.createElement('td');
+                            td.style.border = '1px solid black';
+                            td.style.padding = '5px';
+                            td.textContent = ' '; // Empty cell
+                            tr.appendChild(td);
+                        }
+                        table.appendChild(tr);
+                    }
+                    const content = document.getElementById('content');
+                    content.appendChild(table);
+                }
+            } else {
+                document.execCommand(command, false, null);
+            }
         }
 
         function createReport() {
@@ -178,7 +207,7 @@
             if (currentReport) {
                 previewContainer.innerHTML = `
                     <h3>${currentReport.title}</h3>
-                    <p>${currentReport.content}</p>
+                    <div>${currentReport.content}</div>
                 `;
             } else {
                 previewContainer.innerHTML = '<p>No report available.</p>';
@@ -190,7 +219,7 @@
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write('<html><head><title>Print Report</title></head><body>');
                 printWindow.document.write(`<h3>${currentReport.title}</h3>`);
-                printWindow.document.write(`<p>${currentReport.content}</p>`);
+                printWindow.document.write(`<div>${currentReport.content}</div>`);
                 printWindow.document.write('</body></html>');
                 printWindow.document.close();
                 printWindow.print();
