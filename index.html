@@ -109,7 +109,8 @@
                         <button type="button" onclick="execCommand('justifyLeft')">Align Left</button>
                         <button type="button" onclick="execCommand('justifyCenter')">Center</button>
                         <button type="button" onclick="execCommand('justifyRight')">Align Right</button>
-                        <button type="button" onclick="execCommand('insertTable')">Insert Table</button>
+                        <button type="button" onclick="insertTable()">Insert Table</button>
+                        <button type="button" onclick="insertImage()">Add Image</button>
                         <button type="button" onclick="execCommand('removeFormat')">Clear Formatting</button>
                     </div>
                     <div id="content" contenteditable="true"></div>
@@ -137,29 +138,31 @@
         let currentReport = null;
 
         function execCommand(command) {
-            if (command === 'insertTable') {
-                const rows = prompt('Enter number of rows:');
-                const cols = prompt('Enter number of columns:');
-                if (rows && cols) {
-                    const table = document.createElement('table');
-                    table.style.border = '1px solid black';
-                    table.style.borderCollapse = 'collapse';
-                    for (let i = 0; i < rows; i++) {
-                        const tr = document.createElement('tr');
-                        for (let j = 0; j < cols; j++) {
-                            const td = document.createElement('td');
-                            td.style.border = '1px solid black';
-                            td.style.padding = '5px';
-                            td.textContent = ' '; // Empty cell
-                            tr.appendChild(td);
-                        }
-                        table.appendChild(tr);
+            document.execCommand(command, false, null);
+        }
+
+        function insertTable() {
+            const rows = prompt('Enter number of rows:');
+            const cols = prompt('Enter number of columns:');
+            if (rows && cols) {
+                let tableHTML = '<table style="border: 1px solid black; border-collapse: collapse; width: 100%;">';
+                for (let i = 0; i < rows; i++) {
+                    tableHTML += '<tr>';
+                    for (let j = 0; j < cols; j++) {
+                        tableHTML += '<td style="border: 1px solid black; padding: 5px;">&nbsp;</td>';
                     }
-                    const content = document.getElementById('content');
-                    content.appendChild(table);
+                    tableHTML += '</tr>';
                 }
-            } else {
-                document.execCommand(command, false, null);
+                tableHTML += '</table>';
+                document.execCommand('insertHTML', false, tableHTML);
+            }
+        }
+
+        function insertImage() {
+            const imageUrl = prompt('Enter the URL of the image:');
+            if (imageUrl) {
+                const imgHTML = `<img src="${imageUrl}" style="max-width: 100%; height: auto;">`;
+                document.execCommand('insertHTML', false, imgHTML);
             }
         }
 
@@ -220,7 +223,6 @@
                 printWindow.document.write('<html><head><title>Print Report</title></head><body>');
                 printWindow.document.write(`<h3>${currentReport.title}</h3>`);
                 printWindow.document.write(`<div>${currentReport.content}</div>`);
-                printWindow.document.write('</body></html>');
                 printWindow.document.close();
                 printWindow.print();
             } else {
