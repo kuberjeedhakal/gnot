@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Builder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        header {
+            margin-bottom: 20px;
+        }
+        #layout-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        .toolbar {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .content {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group textarea {
+            height: 200px;
+        }
+        .buttons {
+            margin-top: 10px;
+        }
+        .buttons button {
+            margin-right: 5px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .print-button {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .print-button button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Research Report Builder</h1>
+    </header>
+    <div id="layout-container">
+        <div class="toolbar">
+            <h2>CRUD Operations</h2>
+            <form id="crud-form">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <select id="title">
+                        <option value="Title Page">१. शीर्षक पृष्ठ</option>
+                        <option value="Abstract">२. संक्षिप्त सारांश (Abstract)</option>
+                        <option value="Table of Contents">३. सामग्री तालिका (Table of Contents)</option>
+                        <option value="Introduction">४. परिचय (Introduction)</option>
+                        <option value="Literature Review">५. साहित्य समीक्षा (Literature Review)</option>
+                        <option value="Methodology">६. कार्यप्रणाली (Methodology)</option>
+                        <option value="Analysis and Discussion">७. विश्लेषण र छलफल (Analysis and Discussion)</option>
+                        <option value="Conclusion">८. निष्कर्ष (Conclusion)</option>
+                        <option value="References">९. सन्दर्भ (References)</option>
+                        <option value="Appendices">१०. परिशिष्ट (Appendices)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    <textarea id="content" placeholder="Enter report content"></textarea>
+                </div>
+                <div class="buttons">
+                    <button type="button" onclick="createReport()">Create</button>
+                    <button type="button" onclick="updateReport()">Update</button>
+                    <button type="button" onclick="deleteReport()">Delete</button>
+                </div>
+            </form>
+        </div>
+        <div class="content">
+            <h2>Report Preview</h2>
+            <div id="report-preview">
+                <!-- Dynamic content will appear here -->
+            </div>
+            <div class="print-button">
+                <button onclick="printReport()">Print</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const previewContainer = document.getElementById('report-preview');
+        let currentReport = null;
+
+        function createReport() {
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+
+            if (title && content) {
+                currentReport = { title, content };
+                renderReport();
+                alert('Report created successfully!');
+            } else {
+                alert('Please fill out all fields.');
+            }
+        }
+
+        function updateReport() {
+            if (currentReport) {
+                const title = document.getElementById('title').value.trim();
+                const content = document.getElementById('content').value.trim();
+
+                if (title && content) {
+                    currentReport = { title, content };
+                    renderReport();
+                    alert('Report updated successfully!');
+                } else {
+                    alert('Please fill out all fields.');
+                }
+            } else {
+                alert('No report to update.');
+            }
+        }
+
+        function deleteReport() {
+            if (currentReport) {
+                currentReport = null;
+                renderReport();
+                alert('Report deleted successfully!');
+            } else {
+                alert('No report to delete.');
+            }
+        }
+
+        function renderReport() {
+            if (currentReport) {
+                previewContainer.innerHTML = `
+                    <h3>${currentReport.title}</h3>
+                    <p>${currentReport.content}</p>
+                `;
+            } else {
+                previewContainer.innerHTML = '<p>No report available.</p>';
+            }
+        }
+
+        function printReport() {
+            if (currentReport) {
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write('<html><head><title>Print Report</title></head><body>');
+                printWindow.document.write(`<h3>${currentReport.title}</h3>`);
+                printWindow.document.write(`<p>${currentReport.content}</p>`);
+                printWindow.document.write('</body></html>');
+                printWindow.document.close();
+                printWindow.print();
+            } else {
+                alert('No report to print.');
+            }
+        }
+    </script>
+</body>
+</html>
