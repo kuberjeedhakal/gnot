@@ -60,6 +60,15 @@
             font-size: 16px;
             cursor: pointer;
         }
+        .rich-text-toolbar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .rich-text-toolbar button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -87,7 +96,17 @@
                 </div>
                 <div class="form-group">
                     <label for="content">Content</label>
-                    <textarea id="content" placeholder="Enter report content"></textarea>
+                    <div class="rich-text-toolbar">
+                        <button type="button" onclick="execCommand('bold')">Bold</button>
+                        <button type="button" onclick="execCommand('italic')">Italic</button>
+                        <button type="button" onclick="execCommand('underline')">Underline</button>
+                        <button type="button" onclick="execCommand('insertOrderedList')">Numbered List</button>
+                        <button type="button" onclick="execCommand('insertUnorderedList')">Bullet List</button>
+                        <button type="button" onclick="execCommand('justifyLeft')">Align Left</button>
+                        <button type="button" onclick="execCommand('justifyCenter')">Center</button>
+                        <button type="button" onclick="execCommand('justifyRight')">Align Right</button>
+                    </div>
+                    <div id="content" contenteditable="true" style="border: 1px solid #ccc; padding: 8px; height: 200px; overflow-y: auto;"></div>
                 </div>
                 <div class="buttons">
                     <button type="button" onclick="createReport()">Create</button>
@@ -111,9 +130,13 @@
         const previewContainer = document.getElementById('report-preview');
         let currentReport = null;
 
+        function execCommand(command) {
+            document.execCommand(command, false, null);
+        }
+
         function createReport() {
             const title = document.getElementById('title').value.trim();
-            const content = document.getElementById('content').value.trim();
+            const content = document.getElementById('content').innerHTML.trim();
 
             if (title && content) {
                 currentReport = { title, content };
@@ -127,7 +150,7 @@
         function updateReport() {
             if (currentReport) {
                 const title = document.getElementById('title').value.trim();
-                const content = document.getElementById('content').value.trim();
+                const content = document.getElementById('content').innerHTML.trim();
 
                 if (title && content) {
                     currentReport = { title, content };
