@@ -129,6 +129,7 @@
             </div>
             <div class="print-button">
                 <button onclick="printReport()">Print</button>
+                <button onclick="saveAsWord()">Save as Word</button>
             </div>
         </div>
     </div>
@@ -159,11 +160,21 @@
         }
 
         function insertImage() {
-            const imageUrl = prompt('Enter the URL of the image:');
-            if (imageUrl) {
-                const imgHTML = `<img src="${imageUrl}" style="max-width: 100%; height: auto;">`;
-                document.execCommand('insertHTML', false, imgHTML);
-            }
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = () => {
+                const file = input.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const imgHTML = `<img src="${e.target.result}" style="max-width: 100%; height: auto;">`;
+                        document.execCommand('insertHTML', false, imgHTML);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
         }
 
         function createReport() {
@@ -227,6 +238,24 @@
                 printWindow.print();
             } else {
                 alert('No report to print.');
+            }
+        }
+
+        function saveAsWord() {
+            if (currentReport) {
+                const blob = new Blob([
+                    `<html><head><meta charset='utf-8'><title>${currentReport.title}</title></head><body>` +
+                    `<h3>${currentReport.title}</h3>` +
+                    `<div>${currentReport.content}</div>` +
+                    `</body></html>`
+                ], { type: 'application/msword' });
+
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `${currentReport.title}.doc`;
+                a.click();
+            } else {
+                alert('No report to save.');
             }
         }
     </script>
